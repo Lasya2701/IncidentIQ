@@ -110,6 +110,18 @@ export function HindsightPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [incidentId, selfDrive]);
 
+  // When a scripted stage prop is removed (demo step 6+), fall back to a real
+  // retrieval so the panel ends in its done state with live matches.
+  const prevPropRef = useRef<HindsightStage | undefined>(stageProp);
+  useEffect(() => {
+    const wasPropDriven = prevPropRef.current !== undefined;
+    prevPropRef.current = stageProp;
+    if (selfDrive && wasPropDriven && !matches && !loading) {
+      run();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stageProp]);
+
   const stage = selfDrive ? selfStage : (stageProp as HindsightStage);
   const shownMatches = selfDrive ? matches : matchesProp;
   const shownLoading = selfDrive ? loading : (loadingProp ?? false);

@@ -115,30 +115,62 @@ export default function Workspace() {
       // Auto-driven but real UI: open the resolve confirmation.
       setResolveFlow(true);
     }
+    if (demoStep === 14) {
+      // The follow-up incident appears: switch the workspace to it so judges
+      // see the freshly created memory retrieved as its top match.
+      void api.getIncidents().then((list) => {
+        if (list.some((i) => i.id === "INC-00243")) {
+          setSelectedId("INC-00243");
+          setInvestigation("complete");
+          setShowRemediation(false);
+          setHindsightKey((k) => k + 1);
+        }
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [demoActive, demoStep]);
+
+  // Landing on the workspace with ?demo=1 launches the scripted run.
+  useEffect(() => {
+    if (demoActive && useAppStore.getState().demo.status === "idle") {
+      useAppStore.getState().demoStart();
+    }
+  }, [demoActive]);
 
   const selectIncident = (id: string) => {
     setSelectedId(id);
     setInvestigation("idle");
     setShowRemediation(false);
     setHindsightKey((k) => k + 1);
-    setParams({ incident: id }, { replace: true });
+    // Preserve demo mode across incident switches.
+    const next = new URLSearchParams(params);
+    next.set("incident", id);
+    setParams(next, { replace: true });
   };
 
   const onDiagnosed = (d: Diagnosis) => {
     diagnosisRef.current = d;
     setShowRemediation(true);
     setAiPhase(selectedId ?? "", "diagnosed");
-    toast.success("Diagnosis completed", {
-      description: "Root cause identified with historical context.",
-    });
+    if (!demoActive) {
+      toast.success("Diagnosis completed", {
+        description: "Root cause identified with historical context.",
+      });
+    }
     // Auto-trigger hindsight animation is handled by key remount of HindsightPanel run.
   };
 
   const onResolved = () => {
-    setMemoryModal(true);
+    // In demo mode the script creates the memory itself (step 12), so skip the
+    // manual modal; the real flow stays available outside the demo.
+    if (!demoActive) setMemoryModal(true);
     notify("memory", "Incident resolved", `${selectedId} marked resolved.`);
+    // Completing the real resolve flow releases the script hold and advances
+    // from "Resolve Incident" to "Incident resolved".
+    if (demoActive) {
+      useAppStore.getState().demoAdvance();
+      useAppStore.getState().demoSetHold(false);
+    }
   };
 
   const statusFromPhase = (): Incident["status"] => {
@@ -366,6 +398,7 @@ export default function Workspace() {
             open={resolveFlow}
             onClose={() => setResolveFlow(false)}
             incident={incident}
+            autoConfirm={demoActive}
             onResolved={() => {
               setResolveFlow(false);
               onResolved();

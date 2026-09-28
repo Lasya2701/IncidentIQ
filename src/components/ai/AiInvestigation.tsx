@@ -125,6 +125,29 @@ export function AiInvestigation({
     }
   };
 
+  // External drivers (e.g. the demo script) can set state to "running" without
+  // invoking run(); fetch the diagnosis so the animation has a result to show.
+  const fetchRef = useRef(false);
+  useEffect(() => {
+    if (state === "running" && !fetchRef.current) {
+      fetchRef.current = true;
+      void (async () => {
+        try {
+          const d = await api.runDiagnosis(incidentId);
+          setDiagnosis(d);
+        } catch {
+          fetchRef.current = false;
+          onStateChange("error");
+          setAiPhase(incidentId, "llm_error");
+        }
+      })();
+    }
+    if (state !== "running") {
+      fetchRef.current = false;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state, incidentId]);
+
   return (
     <Card className="hairline-top gap-0 border-ai/25 bg-card p-0">
       <CardHeader className="flex-row flex-wrap items-center justify-between gap-3 border-b border-border/70 px-5 py-4">

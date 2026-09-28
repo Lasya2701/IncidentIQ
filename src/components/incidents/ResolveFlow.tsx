@@ -28,21 +28,17 @@ export function ResolveFlow({
   onClose,
   incident,
   onResolved,
+  autoConfirm = false,
 }: {
   open: boolean;
   onClose: () => void;
   incident: Incident;
   onResolved: () => void;
+  /** Demo mode: auto-driven but real UI — confirms after a visible beat. */
+  autoConfirm?: boolean;
 }) {
   const [phase, setPhase] = useState<"confirm" | "progress" | "done">("confirm");
   const [stage, setStage] = useState(0);
-
-  useEffect(() => {
-    if (open) {
-      setPhase("confirm");
-      setStage(0);
-    }
-  }, [open]);
 
   const confirm = async () => {
     setPhase("progress");
@@ -55,6 +51,23 @@ export function ResolveFlow({
     notify("memory", "Memory extracted", `${incident.id} knowledge stored in Hindsight.`);
     setPhase("done");
   };
+
+  useEffect(() => {
+    if (open) {
+      setPhase("confirm");
+      setStage(0);
+    }
+  }, [open]);
+
+  // Auto-confirm for the scripted demo (step 10) after a short visible beat.
+  useEffect(() => {
+    if (!open || !autoConfirm || phase !== "confirm") return;
+    const t = setTimeout(() => {
+      void confirm();
+    }, 1600);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, autoConfirm, phase]);
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && phase !== "progress" && onClose()}>

@@ -77,6 +77,10 @@ export interface DemoState {
   demoMemoryId?: string;
   /** Whether the second incident INC-00243 exists. */
   secondIncidentActive: boolean;
+  /** Holds scripted auto-advance (e.g. while the resolve modal awaits confirmation). */
+  hold: boolean;
+  /** Increments on start/restart so per-step side effects can re-fire cleanly. */
+  runId: number;
 }
 
 /* ------------------------------------------------------------------ */
@@ -119,6 +123,7 @@ interface AppStore extends NotificationState {
   demoExit: () => void;
   demoAdvance: () => void;
   demoSetMemory: (memoryId: string) => void;
+  demoSetHold: (hold: boolean) => void;
   demoActivateSecondIncident: () => void;
 }
 
@@ -200,8 +205,20 @@ export const useAppStore = create<AppStore>((set, get) => ({
     step: 0,
     demoMemoryId: undefined,
     secondIncidentActive: false,
+    hold: false,
+    runId: 0,
   },
-  demoStart: () => set({ demo: { status: "running", step: 0, secondIncidentActive: false } }),
+  demoStart: () =>
+    set((s) => ({
+      demo: {
+        status: "running",
+        step: 0,
+        demoMemoryId: undefined,
+        secondIncidentActive: false,
+        hold: false,
+        runId: s.demo.runId + 1,
+      },
+    })),
   demoPause: () =>
     set((s) =>
       s.demo.status === "running" ? { demo: { ...s.demo, status: "paused" } } : s,
@@ -210,15 +227,41 @@ export const useAppStore = create<AppStore>((set, get) => ({
     set((s) =>
       s.demo.status === "paused" ? { demo: { ...s.demo, status: "running" } } : s,
     ),
-  demoRestart: () => set({ demo: { status: "running", step: 0, secondIncidentActive: false } }),
+  demoRestart: () =>
+    set((s) => ({
+      demo: {
+        status: "running",
+        step: 0,
+        demoMemoryId: undefined,
+        secondIncidentActive: false,
+        hold: false,
+        runId: s.demo.runId + 1,
+      },
+    })),
   demoSkip: () => {
     const { demo } = get();
     if (demo.step < 14) {
-      set({ demo: { ...demo, step: (demo.step + 1) as DemoStepIndex, status: "running" } });
+      set({
+        demo: {
+          ...demo,
+          step: (demo.step + 1) as DemoStepIndex,
+          status: "running",
+          hold: false,
+        },
+      });
     }
   },
   demoExit: () =>
-    set({ demo: { status: "idle", step: 0, demoMemoryId: undefined, secondIncidentActive: false } }),
+    set({
+      demo: {
+        status: "idle",
+        step: 0,
+        demoMemoryId: undefined,
+        secondIncidentActive: false,
+        hold: false,
+        runId: 0,
+      },
+    }),
   demoAdvance: () => {
     const { demo } = get();
     if (demo.step < 14) {
@@ -228,6 +271,7 @@ export const useAppStore = create<AppStore>((set, get) => ({
     }
   },
   demoSetMemory: (demoMemoryId) => set((s) => ({ demo: { ...s.demo, demoMemoryId } })),
+  demoSetHold: (hold) => set((s) => ({ demo: { ...s.demo, hold } })),
   demoActivateSecondIncident: () =>
     set((s) => ({ demo: { ...s.demo, secondIncidentActive: true } })),
 }));
