@@ -10,7 +10,7 @@ import {
 import { api } from "@/services";
 import { notify } from "@/store/useAppStore";
 import type { Incident } from "@/types/incident-iq";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { BrainCircuit, CircleCheck, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -157,6 +157,3 @@ export function ResolveFlow({
     </Dialog>
   );
 }
-
-/** Tiny helper re-export to keep AnimatePresence import used in future variants. */
-export { AnimatePresence };

@@ -60,7 +60,6 @@ export function HindsightPanel({
   const selfDrive = stageProp === undefined;
   const [selfStage, setSelfStage] = useState<HindsightStage>(selfDrive ? "idle" : (stageProp as HindsightStage));
   const [matches, setMatches] = useState<SimilarMatch[] | undefined>(matchesProp);
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const bumpRetrievals = useAppStore((s) => s.bumpRetrievals);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -72,7 +71,6 @@ export function HindsightPanel({
 
   const run = () => {
     clearTimers();
-    setError(null);
     setLoading(true);
     setSelfStage("searching");
     bumpRetrievals();
@@ -99,10 +97,9 @@ export function HindsightPanel({
           }, elapsed + 300),
         );
       })
-      .catch((err: Error) => {
+      .catch(() => {
         clearTimers();
         setLoading(false);
-        setError(err.message);
         setSelfStage("error");
       });
   };
@@ -111,7 +108,7 @@ export function HindsightPanel({
     if (selfDrive && incidentId) run();
     return clearTimers;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [incidentId]);
+  }, [incidentId, selfDrive]);
 
   const stage = selfDrive ? selfStage : (stageProp as HindsightStage);
   const shownMatches = selfDrive ? matches : matchesProp;

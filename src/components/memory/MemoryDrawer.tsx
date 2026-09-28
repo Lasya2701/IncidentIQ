@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -11,7 +10,6 @@ import {
 import { SourceBadge } from "@/components/ui-kit/Status";
 import { api } from "@/services";
 import { useAppStore } from "@/store/useAppStore";
-import type { MemoryRecord } from "@/types/incident-iq";
 import { formatDate } from "@/utils/format";
 import { useAsyncData } from "@/hooks/useAsyncData";
 import { BookOpen, FileText, Link2, Siren } from "lucide-react";

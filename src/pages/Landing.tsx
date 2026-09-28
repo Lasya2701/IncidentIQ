@@ -8,7 +8,6 @@ import {
   ArrowRight,
   BookOpen,
   BrainCircuit,
-  CircleCheck,
   CircleX,
   Network,
   ScrollText,

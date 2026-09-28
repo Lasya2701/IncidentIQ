@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export interface AsyncState<T> {
   data: T | undefined;
@@ -19,15 +19,12 @@ export function useAsyncData<T>(
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | undefined>(undefined);
   const [tick, setTick] = useState(0);
-  const loaderRef = useRef(loader);
-  loaderRef.current = loader;
 
   useEffect(() => {
     let cancelled = false;
     setIsLoading(true);
     setError(undefined);
-    loaderRef
-      .current()
+    loader()
       .then((result) => {
         if (!cancelled) {
           setData(result);

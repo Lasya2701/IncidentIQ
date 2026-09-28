@@ -8,10 +8,7 @@ import { extraMemories, memories as seedMemories } from "@/data/memories";
 import { postmortems as seedPostmortems } from "@/data/postmortems";
 import { runbooks as seedRunbooks } from "@/data/runbooks";
 import { services as seedServices } from "@/data/services";
-import {
-  pipelineStages,
-  systemHealth,
-} from "@/data/system";
+import { systemHealth } from "@/data/system";
 import type { MemoryProvider, NewMemoryInput, NewPostmortemInput } from "@/services/provider";
 import type {
   AssistantAnswer,
@@ -24,7 +21,6 @@ import type {
   Postmortem,
   RemediationStep,
   Runbook,
-  RunbookResult,
   ServiceNode,
   SimilarMatch,
   SystemHealthEntry,
@@ -55,6 +51,7 @@ function latency(min = 150, max = 900): Promise<void> {
  * effectiveness increments, etc.). Reset on page reload.
  */
 const incidents: Incident[] = initialIncidents.map((i) => ({ ...i }));
+let demoSecondAdded = false;
 const memories: MemoryRecord[] = [...seedMemories, ...extraMemories].map((m) => ({
   ...m,
 }));
@@ -121,6 +118,30 @@ export class MockMemoryProvider implements MemoryProvider {
   async getIncidents(): Promise<Incident[]> {
     await latency();
     return incidents.map((i) => ({ ...i }));
+  }
+
+  /** Demo step 14: add INC-00243 (Order Service pool saturation follow-up). */
+  async ensureDemoSecondIncident(): Promise<Incident> {
+    await latency(150, 300);
+    if (!demoSecondAdded) {
+      demoSecondAdded = true;
+      incidents.unshift({
+        id: "INC-00243",
+        title: "Order Service timeouts from pool saturation",
+        service: "Order Service",
+        severity: "high",
+        status: "investigating",
+        detectedAt: new Date().toISOString(),
+        affectedUsers: 1800,
+        assignee: "Lasya",
+        summary: "Timeouts on order creation; DB pool wait queue growing.",
+        memoryMatches: 2,
+        medianResolutionMinutes: 19,
+        logKey: "INC-00238",
+        timelineKey: undefined,
+      });
+    }
+    return { ...incidents[0] };
   }
 
   async getIncident(id: string): Promise<Incident | undefined> {
@@ -319,12 +340,18 @@ export class MockMemoryProvider implements MemoryProvider {
         const { hits, reasons } = memoryTokenOverlap(q, m);
         const sameService = m.service === incident?.service;
         if (sameService) {
-          hits + 3;
           reasons.unshift(`Same service (${m.service})`);
         }
+        // Freshest context: memories created this session rank first (demo step 15).
+        if (m.sessionCreated) {
+          reasons.unshift("Created moments ago — freshest context");
+        }
         const score = Math.min(
-          93,
-          Math.max(55, 58 + hits * 4 + (sameService ? 8 : 0)),
+          97,
+          Math.max(
+            55,
+            58 + hits * 4 + (sameService ? 8 : 0) + (m.sessionCreated ? 24 : 0),
+          ),
         );
         return { memory: this.clone(m), score, reasons };
       })

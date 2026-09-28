@@ -63,7 +63,7 @@ export default function MemoryPage() {
   const openMemoryDrawer = useAppStore((s) => s.openMemoryDrawer);
   const metrics = useAppStore((s) => s.metrics);
 
-  const memories = data ?? [];
+  const memories = (data ?? []).map((r) => r.memory);
   const filtered = memories.filter((m) => tab === "all" || m.type === tab);
 
   return (

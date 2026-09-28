@@ -19,8 +19,6 @@ import type { LucideIcon } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router";
 import { cn } from "@/lib/utils";
-import { useAppStore } from "@/store/useAppStore";
-import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { DemoBadge } from "@/components/ui-kit/Status";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -75,7 +73,7 @@ const NAV: NavGroup[] = [
       { label: "Incident Analytics", to: "/analytics/incidents", icon: BarChart3 },
       { label: "Resolution Analytics", to: "/analytics/resolution", icon: BarChart3 },
       { label: "Memory Analytics", to: "/analytics/memory", icon: BrainCircuit },
-    },
+    ],
   },
   {
     label: "System",

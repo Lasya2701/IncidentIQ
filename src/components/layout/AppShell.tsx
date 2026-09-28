@@ -1,14 +1,10 @@
 import { MemoryDrawer } from "@/components/memory/MemoryDrawer";
-import { CommandPalette } from "@/components/layout/CommandPalette";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { TopNav } from "@/components/layout/TopNav";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { registerPaletteOpener } from "@/components/layout/commandPaletteBus";
-import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router";
 import { useAppStore } from "@/store/useAppStore";
-import { openCommandPalette } from "@/components/layout/commandPaletteBus";
 
 const SHORTCUT_MAP: Record<string, string> = {
   d: "/dashboard",
@@ -68,11 +64,6 @@ export function AppShell() {
   const closeMemoryDrawer = useAppStore((s) => s.closeMemoryDrawer);
   const memoryDrawerId = useAppStore((s) => s.memoryDrawerId);
 
-  // Register the palette opener once (TopNav also mounts its own instance via palette bus).
-  useEffect(() => {
-    registerPaletteOpener(() => openCommandPalette());
-  }, []);
-
   useEffect(() => {
     let lastG = 0;
     const onKey = (e: KeyboardEvent) => {
@@ -130,11 +121,6 @@ export function AppShell() {
         {memoryDrawerId && <MemoryDrawer id={memoryDrawerId} />}
 
         {showShortcuts && <ShortcutHelp onClose={() => setShowShortcuts(false)} />}
-
-        {/* Palette is mounted here too so it works on pages without TopNav context */}
-        <div className={cn("hidden")}>
-          <CommandPalette />
-        </div>
       </div>
     </TooltipProvider>
   );

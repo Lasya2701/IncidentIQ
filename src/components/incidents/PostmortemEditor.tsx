@@ -56,12 +56,12 @@ export function PostmortemEditor({
         title,
         impact,
         rootCause,
-        timeline: (incident.timelineKey ? [] : []).concat([
+        timeline: [
           { time: "14:32:08", event: "Incident detected" },
           { time: "14:32:28", event: "Hindsight search initiated" },
           { time: "14:33:10", event: "Remediation applied" },
           { time: "14:36:00", event: "Incident resolved" },
-        ]),
+        ],
         resolution,
         contributingFactors: factors.split(";").map((s) => s.trim()).filter(Boolean),
         preventiveActions: actions.split(";").map((s) => s.trim()).filter(Boolean),

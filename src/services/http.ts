@@ -100,4 +100,7 @@ export class HindsightHttpProvider implements MemoryProvider {
   askAssistant(_incidentId: string, _question: string): Promise<AssistantAnswer> {
     return this.notImplemented();
   }
+  ensureDemoSecondIncident(): Promise<Incident> {
+    return this.notImplemented();
+  }
 }

@@ -27,7 +27,6 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { MemoryBadge } from "@/components/ui-kit/Status";
 
 /* ------------------------------------------------------------------ */
 /* Reasoning steps                                                     */
@@ -91,10 +90,8 @@ export function AiInvestigation({
   onDiagnosed?: (d: Diagnosis) => void;
 }) {
   const [diagnosis, setDiagnosis] = useState<Diagnosis | undefined>(undefined);
-  const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<number | undefined>(undefined);
   const setAiPhase = useAppStore((s) => s.setAiPhase);
-  const aiPhase = useAppStore((s) => s.aiPhase[incidentId] ?? "idle");
   const { stepIndex, done } = useReasoningAnimation(state === "running");
   const diagnosedRef = useRef(false);
 
@@ -115,7 +112,6 @@ export function AiInvestigation({
   }, [done, state, diagnosis]);
 
   const run = async () => {
-    setError(null);
     setDiagnosis(undefined);
     diagnosedRef.current = false;
     onStateChange("running");
@@ -123,8 +119,7 @@ export function AiInvestigation({
     try {
       const d = await api.runDiagnosis(incidentId);
       setDiagnosis(d);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "AI unavailable");
+    } catch {
       onStateChange("error");
       setAiPhase(incidentId, "llm_error");
     }
@@ -209,9 +204,9 @@ export function AiInvestigation({
                       {i + 1}. {s.label}
                     </span>
                     {s.memoryTouched && (
-                      <MemoryBadge count={0} className="!gap-0.5 !px-1.5 text-memory">
-                        <BrainCircuit className="size-3" /> memory
-                      </MemoryBadge>
+                      <span className="ml-1 inline-flex items-center gap-0.5 rounded-full border border-memory/30 bg-memory/10 px-1.5 text-[9px] font-semibold uppercase tracking-wide text-memory">
+                        <BrainCircuit className="size-2.5" /> memory
+                      </span>
                     )}
                     <ChevronDown
                       className={cn(

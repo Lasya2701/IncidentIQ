@@ -31,12 +31,6 @@ export default function MemorySearchPage() {
   const openMemoryDrawer = useAppStore((s) => s.openMemoryDrawer);
   const servicesQ = useAsyncData(() => api.getServices(), []);
 
-  // Phase 1 of spec: initial example query preloaded
-  useEffect(() => {
-    run(EXAMPLES[0]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const run = async (q: string) => {
     setSubmitted(q);
     setQuery(q);
@@ -55,6 +49,12 @@ export default function MemorySearchPage() {
       setSearching(false);
     }
   };
+
+  // Initial example query preloaded once.
+  useEffect(() => {
+    run(EXAMPLES[0]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const services = servicesQ.data ?? [];
   const filtered = (results ?? []).filter(

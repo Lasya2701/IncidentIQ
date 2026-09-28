@@ -28,6 +28,13 @@ export default tseslint.config(
         "warn",
         { allowConstantExport: true },
       ],
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+      ],
+      // Deliberate patterns in this app: modal form prefill on open, demo
+      // state-machine sync, and data-load transitions are effect-driven by design.
+      "react-hooks/set-state-in-effect": "warn",
     },
   },
 );

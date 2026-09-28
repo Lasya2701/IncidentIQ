@@ -19,7 +19,6 @@ import {
   Activity,
   BarChart3,
   BrainCircuit,
-  CircleCheck,
   Clock3,
   Gauge,
   Play,
@@ -28,7 +27,6 @@ import {
   Siren,
   Sparkles,
   TriangleAlert,
-  Users,
 } from "lucide-react";
 
 export default function Dashboard() {
@@ -188,5 +186,3 @@ function QuickLink({
     </Link>
   );
 }
-
-export { CircleCheck, Users };

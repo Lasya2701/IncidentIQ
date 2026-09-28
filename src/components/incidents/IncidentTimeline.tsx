@@ -4,7 +4,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   Activity,
   Bell,
-  BookOpen,
   BrainCircuit,
   CircleCheck,
   FileText,
@@ -118,5 +117,3 @@ export function appendTimelineEvent(
 ): TimelineEvent[] {
   return [...events, { ...event, id: `live-${events.length + 1}-${event.kind}` }];
 }
-
-export { BookOpen };

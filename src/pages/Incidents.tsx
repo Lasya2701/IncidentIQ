@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
@@ -18,7 +17,7 @@ import { useAsyncData } from "@/hooks/useAsyncData";
 import { api } from "@/services";
 import { notify } from "@/store/useAppStore";
 import type { Incident, Severity } from "@/types/incident-iq";
-import { formatNumber, shortTime, titleCase } from "@/utils/format";
+import { formatNumber, shortTime } from "@/utils/format";
 import {
   ArrowUpDown,
   BookOpen,
@@ -28,7 +27,6 @@ import {
   Hand,
   MoreHorizontal,
   Search,
-  Siren,
   Sparkles,
   UserPlus,
 } from "lucide-react";
@@ -247,5 +245,3 @@ export default function IncidentsPage() {
     </div>
   );
 }
-
-export { Siren, titleCase };

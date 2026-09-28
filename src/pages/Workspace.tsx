@@ -35,6 +35,8 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import { toast } from "sonner";
+import { DemoController } from "@/components/demo/DemoController";
+import { useDemoRunner } from "@/hooks/useDemoRunner";
 
 function useElapsed(incident: Incident | undefined) {
   const [now, setNow] = useState(() => Date.now());
@@ -65,13 +67,15 @@ export default function Workspace() {
   const diagnosisRef = useRef<Diagnosis | undefined>(undefined);
 
   const incidentList = incidentsQ.data ?? [];
+  const demoActive = params.get("demo") === "1";
+  useDemoRunner(demoActive);
+  const demoStep = useAppStore((s) => s.demo.step);
   const incident = useMemo(
     () => incidentList.find((i) => i.id === selectedId),
     [incidentList, selectedId],
   );
   const elapsed = useElapsed(incident);
   const setAiPhase = useAppStore((s) => s.setAiPhase);
-  const aiPhase = useAppStore((s) => s.aiPhase[selectedId ?? ""] ?? "idle");
 
   // Default selection: INC-00241 (hero), or ?incident= param.
   useEffect(() => {
@@ -94,6 +98,25 @@ export default function Workspace() {
     () => (selectedId ? api.getLogs(selectedId) : Promise.resolve([])),
     [selectedId],
   );
+
+  // Demo mode: drive the workspace panels from the scripted state machine.
+  useEffect(() => {
+    if (!demoActive) return;
+    if (demoStep >= 2 && demoStep < 4 && investigation !== "running") {
+      setInvestigation("running");
+    }
+    if (demoStep >= 4 && investigation === "running") {
+      // Diagnosis completes as the hindsight search begins (step 4+).
+      setInvestigation("complete");
+      setShowRemediation(demoStep >= 9);
+    }
+    if (demoStep >= 9 && !showRemediation) setShowRemediation(true);
+    if (demoStep === 10 && !resolveFlow) {
+      // Auto-driven but real UI: open the resolve confirmation.
+      setResolveFlow(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [demoActive, demoStep]);
 
   const selectIncident = (id: string) => {
     setSelectedId(id);
@@ -306,7 +329,13 @@ export default function Workspace() {
                   <HindsightPanel
                     key={hindsightKey}
                     incidentId={incident.id}
-                    selfDrive={false}
+                    stage={
+                      demoActive && demoStep >= 4 && demoStep < 6
+                        ? demoStep === 4
+                          ? "searching"
+                          : "relevant"
+                        : undefined
+                    }
                   />
                 </div>
               </div>
@@ -328,6 +357,7 @@ export default function Workspace() {
       </div>
 
       <AssistantPanel incidentId={selectedId ?? "INC-00241"} />
+      {demoActive && <DemoController />}
 
       {/* Flows */}
       {incident && (

@@ -52,6 +52,9 @@ export interface MemoryProvider {
   createMemory(input: NewMemoryInput): Promise<MemoryRecord>;
   createPostmortem(input: NewPostmortemInput): Promise<Postmortem>;
   askAssistant(incidentId: string, question: string): Promise<AssistantAnswer>;
+
+  /** Demo support: injects the scripted follow-up incident (demo step 14). */
+  ensureDemoSecondIncident(): Promise<Incident>;
 }
 
 /** Payload for storing a new incident memory. */

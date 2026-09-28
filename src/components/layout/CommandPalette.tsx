@@ -94,7 +94,7 @@ export function CommandPalette() {
     if (!open) return;
     let cancelled = false;
     (async () => {
-      const [incidents, memories, runbooks, postmortems, services, deployments] =
+      const [incidents, memoryResults, runbooks, postmortems, services, deployments] =
         await Promise.all([
           api.getIncidents(),
           api.searchMemory(" "),
@@ -104,7 +104,14 @@ export function CommandPalette() {
           api.getDeployments(),
         ]);
       if (!cancelled) {
-        setBundle({ incidents, memories, runbooks, postmortems, services, deployments });
+        setBundle({
+          incidents,
+          memories: memoryResults.map((r) => r.memory),
+          runbooks,
+          postmortems,
+          services,
+          deployments,
+        });
       }
     })().catch(() => undefined);
     return () => {

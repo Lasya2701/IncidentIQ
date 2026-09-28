@@ -12,12 +12,9 @@ import { cn } from "@/lib/utils";
 import {
   BookOpen,
   BrainCircuit,
-  Check,
   ChevronDown,
-  Clock3,
   Eye,
   Sparkles,
-  Square,
   Timer,
 } from "lucide-react";
 import { useState } from "react";
@@ -207,5 +204,3 @@ function SourceChip({ step }: { step: RemediationStep }) {
     </span>
   );
 }
-
-export { Check, Clock3, Square };
