@@ -84,7 +84,6 @@ export { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, Pagi
 
 // Layout Components
 export { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "./resizable"; // ~8KB - Resizable panels
-export { Sidebar, SidebarProvider, SidebarTrigger, SidebarInset, SidebarHeader, SidebarFooter, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarGroupAction, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarMenuAction, SidebarMenuSub, SidebarMenuSubItem, SidebarMenuSubButton, SidebarMenuBadge, SidebarSeparator, SidebarRail } from "./sidebar"; // ~10KB
 
 // Data Visualization
 export { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent, ChartStyle } from "./chart"; // ~20KB+ (requires recharts - very large!)
